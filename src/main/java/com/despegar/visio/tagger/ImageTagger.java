@@ -33,7 +33,7 @@ public class ImageTagger extends javax.swing.JFrame {
     private String[] tags = {"bar", "bathroom", "bedroom", "breakfast", "city_view", "dinning",
        "hotel_Front", "hotel_exterior_view", "hotel_interior_view",
        "kitchen", "living_room", "lobby", "natural_view", "pool",
-       "recreation", "sports"};
+       "recreation", "sports","undefined"};
     private Integer to;
     private Integer from;
 
