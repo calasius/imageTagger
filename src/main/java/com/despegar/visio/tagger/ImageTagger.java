@@ -341,6 +341,12 @@ public class ImageTagger extends javax.swing.JFrame implements KeyListener {
                 tag();
                 break;
             default:
+                if(Character.isAlphabetic(e.getKeyChar())) {
+                    for (int i = 0; i < this.tagOptionList.getModel().getSize(); i++) {
+                        if (this.tagOptionList.getModel().getElementAt(i).charAt(0) == e.getKeyChar())
+                            this.tagOptionList.setSelectedIndex(i);
+                    }
+                }
                 break;
         }
 
