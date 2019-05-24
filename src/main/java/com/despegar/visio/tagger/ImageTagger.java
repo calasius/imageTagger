@@ -30,12 +30,17 @@ public class ImageTagger extends javax.swing.JFrame {
     private File counterFile;
     private int nextImageIndex;
     private  File[] imageFiles;
-    private String[] tags = {"a","b"};
+    private String[] tags = {"bar", "bathroom", "bedroom", "breakfast", "city_view", "dinning",
+       "hotel_Front", "hotel_exterior_view", "hotel_interior_view",
+       "kitchen", "living_room", "lobby", "natural_view", "pool",
+       "recreation", "sports"};
+    private Integer to;
+    private Integer from;
 
     /**
      * Creates new form ImageTagger
      */
-    public ImageTagger(File imageFolder, File tagFile, File counterFile) {
+    public ImageTagger(File imageFolder, File tagFile, File counterFile, Integer from, Integer to) {
                 this.imageFolder = imageFolder;
         this.tagFile = tagFile;
         this.counterFile = counterFile;
@@ -44,7 +49,8 @@ public class ImageTagger extends javax.swing.JFrame {
         initComponents();
         loadImage();
         this.tagOptionList.setListData(tags);
-
+        this.to = to;
+        this.from = from;
     }
     
     private int loadNextImageIndex() {
@@ -63,6 +69,7 @@ public class ImageTagger extends javax.swing.JFrame {
             return false;
         } else {
             File imageFile = this.imageFiles[nextImageIndex];
+            this.imageLabel.setText(imageFile.getName());
             try {
                 Logger.getLogger(ImageTagger.class.getName()).log(Level.INFO, String.format("Loading image %s ...", imageFile.getName()));
                 BufferedImage image = ImageIO.read(imageFile);
@@ -103,7 +110,8 @@ public class ImageTagger extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         tagOptionList = new javax.swing.JList<>();
         tagButton = new javax.swing.JButton();
-        toCsvButton = new javax.swing.JButton();
+        imageLabel = new javax.swing.JLabel();
+        logLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -135,35 +143,35 @@ public class ImageTagger extends javax.swing.JFrame {
             }
         });
 
-        toCsvButton.setText("To csv");
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGap(25, 25, 25)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(25, 25, 25)
-                        .addComponent(imagePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 543, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(43, 43, 43)
                         .addComponent(previousButton)
-                        .addGap(180, 180, 180)
-                        .addComponent(nextButton)))
-                .addGap(52, 52, 52)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
+                        .addGap(78, 78, 78)
+                        .addComponent(nextButton)
+                        .addGap(136, 136, 136)
                         .addComponent(tagButton)
-                        .addGap(72, 72, 72)
-                        .addComponent(toCsvButton))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 256, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(68, Short.MAX_VALUE))
+                        .addGap(381, 381, 381))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(imageLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(imagePanel, javax.swing.GroupLayout.DEFAULT_SIZE, 543, Short.MAX_VALUE))
+                        .addGap(61, 61, 61)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 256, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(logLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 775, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(59, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(93, 93, 93)
+                .addGap(44, 44, 44)
+                .addComponent(imageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE)
                     .addComponent(imagePanel))
@@ -171,9 +179,10 @@ public class ImageTagger extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(previousButton)
                     .addComponent(nextButton)
-                    .addComponent(tagButton)
-                    .addComponent(toCsvButton))
-                .addContainerGap(54, Short.MAX_VALUE))
+                    .addComponent(tagButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(logLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
@@ -181,7 +190,7 @@ public class ImageTagger extends javax.swing.JFrame {
 
     private void previousButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_previousButtonActionPerformed
         // TODO add your handling code here:
-        if (this.nextImageIndex > 0) {
+        if (this.nextImageIndex > this.from) {
             this.nextImageIndex--;
             loadImage();
         }
@@ -189,7 +198,7 @@ public class ImageTagger extends javax.swing.JFrame {
 
     private void nextButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextButtonActionPerformed
         // TODO add your handling code here:
-        if (this.nextImageIndex < this.imageFiles.length-1){
+        if (this.nextImageIndex < to){
             this.nextImageIndex++;
             loadImage();
         }
@@ -199,6 +208,7 @@ public class ImageTagger extends javax.swing.JFrame {
     private void tagButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tagButtonActionPerformed
         // TODO add your handling code here:
         File imageFile = this.imageFiles[this.nextImageIndex];
+        this.logLabel.setText(String.format("Tagging %s as %s", imageFile.getName(), this.tagOptionList.getSelectedValue()));
         try { 
             FileWriter writer = new FileWriter(this.tagFile, true);
             writer.append(imageFile.getName());
@@ -246,6 +256,8 @@ public class ImageTagger extends javax.swing.JFrame {
         String imageFolderArg = args[0];
         String tagFileArg = args[1];
         String counterFileArg = args[2];
+        Integer from = Integer.valueOf(args[3]);
+        Integer to = Integer.valueOf(args[4]);
         
         System.out.println(String.format("Image folder = %s", imageFolderArg));
         System.out.println(String.format("Tag file = %s", tagFileArg));
@@ -258,18 +270,19 @@ public class ImageTagger extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new ImageTagger(imageFolder, tagFile, counterFile).setVisible(true);
+                new ImageTagger(imageFolder, tagFile, counterFile, from, to).setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel imageLabel;
     private javax.swing.JScrollPane imagePanel;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel logLabel;
     private javax.swing.JButton nextButton;
     private javax.swing.JButton previousButton;
     private javax.swing.JButton tagButton;
     private javax.swing.JList<String> tagOptionList;
-    private javax.swing.JButton toCsvButton;
     // End of variables declaration//GEN-END:variables
 }
