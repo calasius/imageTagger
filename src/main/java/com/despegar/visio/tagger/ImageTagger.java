@@ -262,10 +262,25 @@ public class ImageTagger extends javax.swing.JFrame {
         System.out.println(String.format("Image folder = %s", imageFolderArg));
         System.out.println(String.format("Tag file = %s", tagFileArg));
         System.out.println(String.format("Counter file = %s", counterFileArg));
+        System.out.println(String.format("from = %s", from));
+        System.out.println(String.format("to = %s", to));
         
         File imageFolder = new File(imageFolderArg);
         File tagFile = new File(tagFileArg);
         File counterFile = new File(counterFileArg);
+        
+        try {
+            tagFile.createNewFile();
+            boolean newFile = counterFile.createNewFile();
+            if (newFile) {
+                try (FileWriter writer = new FileWriter(counterFile)) {
+                    writer.append(from + "");
+                    writer.flush();
+                }
+            }
+        } catch(IOException e) {
+            System.out.println(String.format("Error when creating file %s or file %s error + %s", tagFile.getName(), counterFile.getName(), e.getMessage()));
+        }
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
