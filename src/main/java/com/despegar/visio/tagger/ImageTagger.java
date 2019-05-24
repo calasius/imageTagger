@@ -9,6 +9,7 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -29,6 +30,7 @@ public class ImageTagger extends javax.swing.JFrame {
     private File counterFile;
     private int nextImageIndex;
     private  File[] imageFiles;
+    private String[] tags = {"a","b"};
 
     /**
      * Creates new form ImageTagger
@@ -41,6 +43,8 @@ public class ImageTagger extends javax.swing.JFrame {
         this.imageFiles = this.imageFolder.listFiles();
         initComponents();
         loadImage();
+        this.tagOptionList.setListData(tags);
+
     }
     
     private int loadNextImageIndex() {
@@ -66,7 +70,9 @@ public class ImageTagger extends javax.swing.JFrame {
                 ImageIcon icon = new ImageIcon(image);
                 this.imagePanel.getViewport().add(new JLabel(icon));
             } catch (IOException ex) {
-                Logger.getLogger(ImageTagger.class.getName()).log(Level.SEVERE, String.format("Can't load image %s = ", imageFile.getName()), ex);
+                Logger.getLogger(ImageTagger.class.getName()).log(Level.SEVERE, String.format("Can't load image %s = ", imageFile.getName()));
+            } catch (Exception e) {
+                Logger.getLogger(ImageTagger.class.getName()).log(Level.SEVERE, String.format("Can't load image %s = ", imageFile.getName()));
             }
         }
         return false;
@@ -95,8 +101,9 @@ public class ImageTagger extends javax.swing.JFrame {
         previousButton = new javax.swing.JButton();
         nextButton = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList<>();
+        tagOptionList = new javax.swing.JList<>();
         tagButton = new javax.swing.JButton();
+        toCsvButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -114,33 +121,44 @@ public class ImageTagger extends javax.swing.JFrame {
             }
         });
 
-        jList1.setModel(new javax.swing.AbstractListModel<String>() {
+        tagOptionList.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
         });
-        jScrollPane1.setViewportView(jList1);
+        jScrollPane1.setViewportView(tagOptionList);
 
         tagButton.setText("Tag");
+        tagButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tagButtonActionPerformed(evt);
+            }
+        });
+
+        toCsvButton.setText("To csv");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(25, 25, 25)
-                .addComponent(imagePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 543, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(25, 25, 25)
+                        .addComponent(imagePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 543, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(43, 43, 43)
+                        .addComponent(previousButton)
+                        .addGap(180, 180, 180)
+                        .addComponent(nextButton)))
                 .addGap(52, 52, 52)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 256, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(tagButton)
+                        .addGap(72, 72, 72)
+                        .addComponent(toCsvButton))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 256, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(68, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(43, 43, 43)
-                .addComponent(previousButton)
-                .addGap(180, 180, 180)
-                .addComponent(nextButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(tagButton)
-                .addGap(151, 151, 151))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -153,7 +171,8 @@ public class ImageTagger extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(previousButton)
                     .addComponent(nextButton)
-                    .addComponent(tagButton))
+                    .addComponent(tagButton)
+                    .addComponent(toCsvButton))
                 .addContainerGap(54, Short.MAX_VALUE))
         );
 
@@ -162,15 +181,40 @@ public class ImageTagger extends javax.swing.JFrame {
 
     private void previousButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_previousButtonActionPerformed
         // TODO add your handling code here:
-        this.nextImageIndex--;
-        loadImage();
+        if (this.nextImageIndex > 0) {
+            this.nextImageIndex--;
+            loadImage();
+        }
     }//GEN-LAST:event_previousButtonActionPerformed
 
     private void nextButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextButtonActionPerformed
         // TODO add your handling code here:
-        this.nextImageIndex++;
-        loadImage();
+        if (this.nextImageIndex < this.imageFiles.length-1){
+            this.nextImageIndex++;
+            loadImage();
+        }
+
     }//GEN-LAST:event_nextButtonActionPerformed
+
+    private void tagButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tagButtonActionPerformed
+        // TODO add your handling code here:
+        File imageFile = this.imageFiles[this.nextImageIndex];
+        try { 
+            FileWriter writer = new FileWriter(this.tagFile, true);
+            writer.append(imageFile.getName());
+            writer.append(",");
+            writer.append(this.tagOptionList.getSelectedValue());
+            writer.append("\n");
+            writer.flush();
+            writer.close();
+            writer = new FileWriter(this.counterFile);
+            writer.append(this.nextImageIndex + "");
+            writer.flush();
+            writer.close();
+        } catch (IOException ex) {
+            Logger.getLogger(ImageTagger.class.getName()).log(Level.SEVERE, "Can't open tagFile", ex);
+        }
+    }//GEN-LAST:event_tagButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -221,10 +265,11 @@ public class ImageTagger extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane imagePanel;
-    private javax.swing.JList<String> jList1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JButton nextButton;
     private javax.swing.JButton previousButton;
     private javax.swing.JButton tagButton;
+    private javax.swing.JList<String> tagOptionList;
+    private javax.swing.JButton toCsvButton;
     // End of variables declaration//GEN-END:variables
 }
