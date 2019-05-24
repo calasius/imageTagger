@@ -6,6 +6,8 @@
 package com.despegar.visio.tagger;
 
 import java.awt.Image;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -22,7 +24,7 @@ import javax.swing.JLabel;
  *
  * @author claudio.gauna
  */
-public class ImageTagger extends javax.swing.JFrame {
+public class ImageTagger extends javax.swing.JFrame implements KeyListener {
     
     
     private File imageFolder;
@@ -51,6 +53,10 @@ public class ImageTagger extends javax.swing.JFrame {
         this.tagOptionList.setListData(tags);
         this.to = to;
         this.from = from;
+        addKeyListener(this);        
+        setFocusable(true);
+        setFocusTraversalKeysEnabled(false);
+        
     }
     
     private int loadNextImageIndex() {
@@ -189,27 +195,38 @@ public class ImageTagger extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void previousButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_previousButtonActionPerformed
+        previous();
+    }//GEN-LAST:event_previousButtonActionPerformed
+
+    private void previous() {
         // TODO add your handling code here:
         if (this.nextImageIndex > this.from) {
             this.nextImageIndex--;
             loadImage();
         }
-    }//GEN-LAST:event_previousButtonActionPerformed
+    }
 
     private void nextButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextButtonActionPerformed
+        next();
+    }//GEN-LAST:event_nextButtonActionPerformed
+
+    private void next() {
         // TODO add your handling code here:
         if (this.nextImageIndex < to){
             this.nextImageIndex++;
             loadImage();
         }
-
-    }//GEN-LAST:event_nextButtonActionPerformed
+    }
 
     private void tagButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tagButtonActionPerformed
+        tag();
+    }//GEN-LAST:event_tagButtonActionPerformed
+
+    private void tag() {
         // TODO add your handling code here:
         File imageFile = this.imageFiles[this.nextImageIndex];
         this.logLabel.setText(String.format("Tagging %s as %s", imageFile.getName(), this.tagOptionList.getSelectedValue()));
-        try { 
+        try {
             FileWriter writer = new FileWriter(this.tagFile, true);
             writer.append(imageFile.getName());
             writer.append(",");
@@ -224,7 +241,7 @@ public class ImageTagger extends javax.swing.JFrame {
         } catch (IOException ex) {
             Logger.getLogger(ImageTagger.class.getName()).log(Level.SEVERE, "Can't open tagFile", ex);
         }
-    }//GEN-LAST:event_tagButtonActionPerformed
+    }
 
     /**
      * @param args the command line arguments
@@ -300,4 +317,52 @@ public class ImageTagger extends javax.swing.JFrame {
     private javax.swing.JButton tagButton;
     private javax.swing.JList<String> tagOptionList;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_RIGHT:
+                next();
+                break;
+            case KeyEvent.VK_LEFT:
+                previous();
+                break;
+            case KeyEvent.VK_DOWN:
+                selectDown();
+                break;
+            case KeyEvent.VK_UP:
+                selectUp();
+                break;
+            case KeyEvent.VK_ENTER:
+                tag();
+                break;
+            default:
+                break;
+        }
+
+    }
+    @Override
+    public void keyTyped(KeyEvent e) {
+    }
+    
+    private void selectUp() {
+        int actual = this.tagOptionList.getSelectedIndex();
+        if (actual == -1)
+            this.tagOptionList.setSelectedIndex(0);
+        else if (actual > 0)
+            this.tagOptionList.setSelectedIndex(actual - 1);
+     
+    }
+    
+    private void selectDown() {
+        int actual = this.tagOptionList.getSelectedIndex();
+        if (actual == -1)
+            this.tagOptionList.setSelectedIndex(0);
+        else if (actual < this.tagOptionList.getModel().getSize() - 1)
+            this.tagOptionList.setSelectedIndex(actual + 1);
+    }
 }
