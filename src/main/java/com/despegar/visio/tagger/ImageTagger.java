@@ -264,7 +264,7 @@ public class ImageTagger extends javax.swing.JFrame implements KeyListener {
             FileWriter writer = new FileWriter(this.tagFile, true);
             writer.append(imageFile.getName());
             writer.append(",");
-            writer.append(String.join(",", this.selectedTags));
+            writer.append(String.join(";", this.selectedTags));
             writer.append("\n");
             writer.flush();
             writer.close();
