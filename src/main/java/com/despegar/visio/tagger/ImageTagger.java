@@ -13,6 +13,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,17 +35,22 @@ public class ImageTagger extends javax.swing.JFrame implements KeyListener {
     private File counterFile;
     private int nextImageIndex;
     private  File[] imageFiles;
-    private String[] tags = {"bar", "bathroom", "bedroom", "breakfast", "city_view", "dinning",
-       "hotel_Front", "hotel_exterior_view", "hotel_interior_view",
-       "kitchen", "living_room", "lobby", "natural_view", "pool",
-       "recreation", "sports","undefined"};
+    private String[] tags = new String[]{"exterior_view", "lobby_view", "pool_view", "restaurant", "Health_club", "guest_room",
+           "suite", "meeting_room", "ballroom","golf_course", "beach",
+           "spa", "bar_lounge", "recreational_facility", "logo", "basics",
+           "map", "promotional","hot_news", "Miscellaneous", "guest_room_amenities", "property amenities",
+           "business_center", "bathroom", "breakfast", "city_view", "kitchen", "natural_view", "hotel_front"};
     private Integer to;
     private Integer from;
+    
+    private List<String> selectedTags ;
 
     /**
      * Creates new form ImageTagger
      */
     public ImageTagger(File imageFolder, File tagFile, File counterFile, Integer from, Integer to) {
+         Arrays.sort(tags, (i,j) -> i.compareToIgnoreCase(j));
+
                 this.imageFolder = imageFolder;
         this.tagFile = tagFile;
         this.counterFile = counterFile;
@@ -53,6 +61,7 @@ public class ImageTagger extends javax.swing.JFrame implements KeyListener {
         this.tagOptionList.setListData(tags);
         this.to = to;
         this.from = from;
+        this.selectedTags = new ArrayList<>();
         addKeyListener(this);        
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
@@ -118,8 +127,10 @@ public class ImageTagger extends javax.swing.JFrame implements KeyListener {
         tagButton = new javax.swing.JButton();
         imageLabel = new javax.swing.JLabel();
         logLabel = new javax.swing.JLabel();
+        saveButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setPreferredSize(new java.awt.Dimension(944, 800));
 
         previousButton.setText("Previous");
         previousButton.addActionListener(new java.awt.event.ActionListener() {
@@ -149,6 +160,13 @@ public class ImageTagger extends javax.swing.JFrame implements KeyListener {
             }
         });
 
+        saveButton.setText("Save");
+        saveButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -157,20 +175,24 @@ public class ImageTagger extends javax.swing.JFrame implements KeyListener {
                 .addGap(25, 25, 25)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(previousButton)
-                        .addGap(78, 78, 78)
-                        .addComponent(nextButton)
-                        .addGap(136, 136, 136)
-                        .addComponent(tagButton)
-                        .addGap(381, 381, 381))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(previousButton)
+                                .addGap(47, 47, 47)
+                                .addComponent(nextButton)
+                                .addGap(71, 71, 71)
+                                .addComponent(tagButton)
+                                .addGap(67, 67, 67)
+                                .addComponent(saveButton))
+                            .addComponent(logLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 775, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addContainerGap(143, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(imageLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(imagePanel, javax.swing.GroupLayout.DEFAULT_SIZE, 543, Short.MAX_VALUE))
-                        .addGap(61, 61, 61)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 256, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(logLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 775, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(59, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 256, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(48, 48, 48))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -178,17 +200,20 @@ public class ImageTagger extends javax.swing.JFrame implements KeyListener {
                 .addGap(44, 44, 44)
                 .addComponent(imageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE)
-                    .addComponent(imagePanel))
-                .addGap(30, 30, 30)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(imagePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 453, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 100, Short.MAX_VALUE)))
+                .addGap(18, 18, 18)
+                .addComponent(logLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(previousButton)
                     .addComponent(nextButton)
-                    .addComponent(tagButton))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(logLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
-                .addContainerGap())
+                    .addComponent(tagButton)
+                    .addComponent(saveButton))
+                .addGap(16, 16, 16))
         );
 
         pack();
@@ -217,20 +242,29 @@ public class ImageTagger extends javax.swing.JFrame implements KeyListener {
             loadImage();
         }
     }
+    
+    private void tag() {
+        this.selectedTags.add(this.tagOptionList.getSelectedValue());
+    }
 
     private void tagButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tagButtonActionPerformed
         tag();
     }//GEN-LAST:event_tagButtonActionPerformed
 
-    private void tag() {
+    private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
+        // TODO add your handling code here:
+        save();
+    }//GEN-LAST:event_saveButtonActionPerformed
+
+    private void save() {
         // TODO add your handling code here:
         File imageFile = this.imageFiles[this.nextImageIndex];
-        this.logLabel.setText(String.format("Tagging %s as %s", imageFile.getName(), this.tagOptionList.getSelectedValue()));
+        this.logLabel.setText(String.format("Tagging %s as %s", imageFile.getName(), this.selectedTags.toString()));
         try {
             FileWriter writer = new FileWriter(this.tagFile, true);
             writer.append(imageFile.getName());
             writer.append(",");
-            writer.append(this.tagOptionList.getSelectedValue());
+            writer.append(String.join(",", this.selectedTags));
             writer.append("\n");
             writer.flush();
             writer.close();
@@ -240,6 +274,8 @@ public class ImageTagger extends javax.swing.JFrame implements KeyListener {
             writer.close();
         } catch (IOException ex) {
             Logger.getLogger(ImageTagger.class.getName()).log(Level.SEVERE, "Can't open tagFile", ex);
+        } finally {
+            this.selectedTags = new ArrayList();
         }
     }
 
@@ -314,6 +350,7 @@ public class ImageTagger extends javax.swing.JFrame implements KeyListener {
     private javax.swing.JLabel logLabel;
     private javax.swing.JButton nextButton;
     private javax.swing.JButton previousButton;
+    private javax.swing.JButton saveButton;
     private javax.swing.JButton tagButton;
     private javax.swing.JList<String> tagOptionList;
     // End of variables declaration//GEN-END:variables
@@ -339,6 +376,9 @@ public class ImageTagger extends javax.swing.JFrame implements KeyListener {
                 break;
             case KeyEvent.VK_ENTER:
                 tag();
+                break;
+            case KeyEvent.VK_SPACE:
+                save();
                 break;
             default:
                 if(Character.isAlphabetic(e.getKeyChar())) {
