@@ -36,10 +36,10 @@ public class ImageTagger extends javax.swing.JFrame implements KeyListener {
     private int nextImageIndex;
     private  File[] imageFiles;
     private String[] tags = new String[]{"exterior_view", "lobby_view", "pool_view", "restaurant", "Health_club", "guest_room",
-           "suite", "meeting_room", "ballroom","golf_course", "beach",
-           "spa", "bar_lounge", "recreational_facility", "logo", "basics",
-           "map", "promotional","hot_news", "Miscellaneous", "guest_room_amenities", "property amenities",
-           "business_center", "bathroom", "breakfast", "city_view", "kitchen", "natural_view", "hotel_front"};
+          "suite", "meeting_room", "ballroom","golf_course", "beach",
+          "spa", "bar_lounge", "recreational_facility", "logo", "basics",
+          "map", "promotional","hot_news", "Miscellaneous", "guest_room_amenities", "property_amenities",
+          "business_center", "bathroom", "breakfast", "city_view", "kitchen", "natural_view", "hotel_front", "living_room", "interior_view"};
     private Integer to;
     private Integer from;
     
@@ -315,6 +315,7 @@ public class ImageTagger extends javax.swing.JFrame implements KeyListener {
         System.out.println(String.format("Image folder = %s", imageFolderArg));
         System.out.println(String.format("Tag file = %s", tagFileArg));
         System.out.println(String.format("Counter file = %s", counterFileArg));
+        
         System.out.println(String.format("from = %s", from));
         System.out.println(String.format("to = %s", to));
         
