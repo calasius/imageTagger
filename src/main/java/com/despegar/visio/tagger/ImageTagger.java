@@ -94,10 +94,11 @@ public class ImageTagger extends javax.swing.JFrame implements KeyListener {
     
     private boolean loadImage() {
         String imagePath = this.imageFolder.getAbsolutePath();
+        System.out.println(imagePath);
         if(nextImageIndex > this.imageFiles.length) {
             return false;
         } else {
-            File imageFile = new File(imagePath + this.mediaKeys.get(nextImageIndex));
+            File imageFile = new File(imagePath + "/" + this.mediaKeys.get(nextImageIndex));
             this.imageLabel.setText(imageFile.getName());
             try {
                 Logger.getLogger(ImageTagger.class.getName()).log(Level.INFO, String.format("Loading image %s ...", imageFile.getName()));
