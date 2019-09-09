@@ -94,6 +94,7 @@ public class ImageTagger extends javax.swing.JFrame implements KeyListener {
     }
     
     private boolean loadImage() {
+	System.out.println("loading image");
         String imagePath = this.imageFolder.getAbsolutePath();
         if(nextImageIndex > this.imageFiles.length) {
             return false;
@@ -274,11 +275,11 @@ public class ImageTagger extends javax.swing.JFrame implements KeyListener {
 
     private void save() {
         // TODO add your handling code here:
-        File imageFile = this.imageFiles[this.nextImageIndex];
-        this.logLabel.setText(String.format("Tagging %s as %s", imageFile.getName(), this.selectedTags.toString()));
+        String imageFile = this.mediaKeys.get(this.nextImageIndex);
+        this.logLabel.setText(String.format("Tagging %s as %s", imageFile, this.selectedTags.toString()));
         try {
             FileWriter writer = new FileWriter(this.tagFile, true);
-            writer.append(imageFile.getName());
+            writer.append(imageFile);
             writer.append(",");
             writer.append(String.join(";", this.selectedTags));
             writer.append("\n");
