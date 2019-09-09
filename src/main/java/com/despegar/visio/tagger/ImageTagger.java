@@ -58,6 +58,7 @@ public class ImageTagger extends javax.swing.JFrame implements KeyListener {
         this.nextImageIndex = loadNextImageIndex();
         this.imageFiles = this.imageFolder.listFiles();
         initComponents();
+        this.mediaKeys = loadMediaKeys(mediaKeysFile);
         loadImage();
         this.tagOptionList.setListData(tags);
         this.to = to;
@@ -66,19 +67,19 @@ public class ImageTagger extends javax.swing.JFrame implements KeyListener {
         addKeyListener(this);        
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
-        this.mediaKeys = loadMediaKeys(mediaKeysFile);
     }
     
     private List<String> loadMediaKeys(File mediaKeysFile) throws FileNotFoundException {
-        List<String> mediaKeys = new ArrayList();
+        List<String> mediaKeysList = new ArrayList();
         Scanner fileReader = new Scanner(mediaKeysFile);
         while(fileReader.hasNextLine()) {
             String line = fileReader.nextLine();
             String[] parts = line.split(",");
-            mediaKeys.add(parts[1]);
+            mediaKeysList.add(parts[1]);
         }
-        mediaKeys.sort(String::compareToIgnoreCase);
-        return mediaKeys;
+        mediaKeysList.sort(String::compareToIgnoreCase);
+        Logger.getLogger(ImageTagger.class.getName()).log(Level.INFO, String.valueOf(mediaKeysList.size()));
+        return mediaKeysList;
     }
     
     private int loadNextImageIndex() {
@@ -94,11 +95,11 @@ public class ImageTagger extends javax.swing.JFrame implements KeyListener {
     
     private boolean loadImage() {
         String imagePath = this.imageFolder.getAbsolutePath();
-        System.out.println(imagePath);
         if(nextImageIndex > this.imageFiles.length) {
             return false;
         } else {
-            File imageFile = new File(imagePath + "/" + this.mediaKeys.get(nextImageIndex));
+            String filePath = imagePath + "/" + this.mediaKeys.get(Math.min(nextImageIndex, this.mediaKeys.size()-1));
+            File imageFile = new File(filePath);
             this.imageLabel.setText(imageFile.getName());
             try {
                 Logger.getLogger(ImageTagger.class.getName()).log(Level.INFO, String.format("Loading image %s ...", imageFile.getName()));
