@@ -42,13 +42,14 @@ public class ImageTagger extends javax.swing.JFrame implements KeyListener {
           "business_center", "bathroom", "breakfast", "city_view", "kitchen", "natural_view", "hotel_front", "living_room", "interior_view"};
     private Integer to;
     private Integer from;
+    private List<String> mediaKeys;
     
     private List<String> selectedTags ;
 
     /**
      * Creates new form ImageTagger
      */
-    public ImageTagger(File imageFolder, File tagFile, File counterFile, Integer from, Integer to) {
+    public ImageTagger(File imageFolder, File tagFile, File counterFile, Integer from, Integer to, File mediaKeysFile) throws FileNotFoundException {
          Arrays.sort(tags, (i,j) -> i.compareToIgnoreCase(j));
 
                 this.imageFolder = imageFolder;
@@ -65,7 +66,19 @@ public class ImageTagger extends javax.swing.JFrame implements KeyListener {
         addKeyListener(this);        
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
-        
+        this.mediaKeys = loadMediaKeys(mediaKeysFile);
+    }
+    
+    private List<String> loadMediaKeys(File mediaKeysFile) throws FileNotFoundException {
+        List<String> mediaKeys = new ArrayList();
+        Scanner fileReader = new Scanner(mediaKeysFile);
+        while(fileReader.hasNextLine()) {
+            String line = fileReader.nextLine();
+            String[] parts = line.split(",");
+            mediaKeys.add(parts[1]);
+        }
+        mediaKeys.sort(String::compareToIgnoreCase);
+        return mediaKeys;
     }
     
     private int loadNextImageIndex() {
@@ -80,10 +93,11 @@ public class ImageTagger extends javax.swing.JFrame implements KeyListener {
     }
     
     private boolean loadImage() {
+        String imagePath = this.imageFolder.getAbsolutePath();
         if(nextImageIndex > this.imageFiles.length) {
             return false;
         } else {
-            File imageFile = this.imageFiles[nextImageIndex];
+            File imageFile = new File(imagePath + this.mediaKeys.get(nextImageIndex));
             this.imageLabel.setText(imageFile.getName());
             try {
                 Logger.getLogger(ImageTagger.class.getName()).log(Level.INFO, String.format("Loading image %s ...", imageFile.getName()));
@@ -311,6 +325,7 @@ public class ImageTagger extends javax.swing.JFrame implements KeyListener {
         String counterFileArg = args[2];
         Integer from = Integer.valueOf(args[3]);
         Integer to = Integer.valueOf(args[4]);
+        String mediaKeys = args[5];
         
         System.out.println(String.format("Image folder = %s", imageFolderArg));
         System.out.println(String.format("Tag file = %s", tagFileArg));
@@ -318,10 +333,12 @@ public class ImageTagger extends javax.swing.JFrame implements KeyListener {
         
         System.out.println(String.format("from = %s", from));
         System.out.println(String.format("to = %s", to));
+        System.out.println(String.format("media keys file = %s", mediaKeys));
         
         File imageFolder = new File(imageFolderArg);
         File tagFile = new File(tagFileArg);
         File counterFile = new File(counterFileArg);
+        File mediaKeysFile = new File(mediaKeys);
         
         try {
             tagFile.createNewFile();
@@ -339,7 +356,11 @@ public class ImageTagger extends javax.swing.JFrame implements KeyListener {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new ImageTagger(imageFolder, tagFile, counterFile, from, to).setVisible(true);
+                try {
+                    new ImageTagger(imageFolder, tagFile, counterFile, from, to, mediaKeysFile).setVisible(true);
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(ImageTagger.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
